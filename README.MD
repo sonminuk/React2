@@ -36,8 +36,6 @@ export default ExamplePage;
 1. useEffect 훅을 사용하는 방법
 useEffect 훅을 사용하면 컴포넌트가 클라이언트에서만 렌더링되도록 할 수 있습니다. 이 방법은 서버에서 렌더링될 때는 해당 컴포넌트를 건너뛰고, 클라이언트에서만 렌더링하게 만듭니다.
 
-javascript
-코드 복사
 import { useEffect, useState } from 'react';
 
 function ClientOnlyComponent() {
@@ -59,8 +57,6 @@ export default ClientOnlyComponent;
 2. dynamic 함수를 사용하는 방법
 Next.js의 dynamic 함수를 사용하여 특정 컴포넌트를 클라이언트에서만 동적으로 로드할 수 있습니다. 이 방법은 서버사이드 렌더링을 비활성화하고, 클라이언트에서만 해당 컴포넌트를 렌더링합니다.
 
-javascript
-코드 복사
 import dynamic from 'next/dynamic';
 
 // 서버사이드 렌더링을 비활성화한 상태로 컴포넌트 로드
@@ -82,8 +78,6 @@ export default function Page() {
 1. getStaticProps를 사용하는 방법
 getStaticProps 함수는 빌드 시점에 데이터를 미리 가져와서 정적 페이지로 생성할 때 사용됩니다.
 
-javascript
-코드 복사
 // pages/static-example.js
 
 export async function getStaticProps() {
@@ -112,8 +106,7 @@ export default StaticExamplePage;
 2. getStaticPaths와 getStaticProps를 함께 사용하는 방법
 동적 라우팅이 필요한 경우 getStaticPaths와 getStaticProps를 함께 사용하여 여러 정적 페이지를 생성할 수 있습니다.
 
-javascript
-코드 복사
+
 // pages/posts/[id].js
 
 export async function getStaticPaths() {
