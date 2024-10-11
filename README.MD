@@ -463,3 +463,98 @@ export default MyDocument;
 ```
 
 이 두 파일을 커스터마이징하여 Next.js 애플리케이션의 전체적인 구조와 동작을 제어할 수 있습니다.
+
+
+# Next.js Navigation: Link vs router.push
+
+Next.js에서는 페이지 간 네비게이션을 위해 주로 두 가지 방법을 사용합니다: `Link` 컴포넌트와 `router.push` 메서드. 각각의 특징과 사용법을 알아보겠습니다.
+
+## 목차
+1. [Link 컴포넌트](#link-컴포넌트)
+2. [router.push 메서드](#routerpush-메서드)
+3. [차이점](#차이점)
+4. [언제 무엇을 사용해야 할까?](#언제-무엇을-사용해야-할까)
+
+## Link 컴포넌트
+
+`Link` 컴포넌트는 Next.js에서 제공하는 내장 컴포넌트로, 클라이언트 사이드 네비게이션을 위해 사용됩니다.
+
+### 특징
+- 선언적 방식의 네비게이션
+- 자동 프리페칭 (prefetching)
+- 접근성 (a11y) 지원
+
+### 사용법
+```jsx
+import Link from 'next/link'
+
+function NavMenu() {
+  return (
+    <nav>
+      <Link href="/">Home</Link>
+      <Link href="/about">About</Link>
+    </nav>
+  )
+}
+```
+
+## router.push 메서드
+
+`router.push`는 `useRouter` 훅을 통해 제공되는 프로그래매틱 네비게이션 메서드입니다.
+
+### 특징
+- 명령적 방식의 네비게이션
+- 동적인 URL 생성에 유용
+- 조건부 네비게이션에 적합
+
+### 사용법
+```jsx
+import { useRouter } from 'next/router'
+
+function LoginButton() {
+  const router = useRouter()
+
+  const handleLogin = async (user) => {
+    // 로그인 로직
+    await loginUser(user)
+    router.push('/dashboard')
+  }
+
+  return <button onClick={handleLogin}>Login</button>
+}
+```
+
+## 차이점
+
+1. **사용 방식**: 
+   - `Link`는 선언적 (JSX 내에서 사용)
+   - `router.push`는 명령적 (JavaScript 함수 내에서 사용)
+
+2. **프리페칭**:
+   - `Link`는 자동으로 링크된 페이지를 프리페치
+   - `router.push`는 수동으로 프리페치 설정 필요
+
+3. **SEO 및 접근성**:
+   - `Link`는 일반 `<a>` 태그로 렌더링되어 SEO 및 접근성에 유리
+   - `router.push`는 프로그래매틱하게 동작하여 SEO에 직접적인 영향 없음
+
+4. **동적 라우팅**:
+   - `router.push`는 복잡한 동적 라우팅에 더 유연
+   - `Link`도 동적 `href`를 지원하지만, 복잡한 로직에는 제한적
+
+## 언제 무엇을 사용해야 할까?
+
+- **`Link` 사용**:
+  - 정적인 네비게이션 링크 (메뉴, 네비게이션 바 등)
+  - SEO와 접근성이 중요한 경우
+  - 사용자가 클릭할 수 있는 모든 일반적인 링크
+
+- **`router.push` 사용**:
+  - 폼 제출 후 리다이렉트
+  - 조건부 네비게이션 (예: 인증 상태에 따른 리다이렉트)
+  - 프로그래매틱하게 URL을 조작해야 하는 경우
+  - 복잡한 라우팅 로직이 필요한 경우
+
+두 방법 모두 Next.js의 클라이언트 사이드 라우팅을 활용하므로, 전체 페이지 리로드 없이 빠른 네비게이션을 제공합니다. 상황에 따라 적절한 방법을 선택하여 사용하면 됩니다.
+
+
