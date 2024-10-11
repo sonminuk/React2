@@ -464,12 +464,12 @@ export default MyDocument;
 
 이 두 파일을 커스터마이징하여 Next.js 애플리케이션의 전체적인 구조와 동작을 제어할 수 있습니다.
 
-
 # Next.js Navigation: Link vs router.push
 
 Next.js에서는 페이지 간 네비게이션을 위해 주로 두 가지 방법을 사용합니다: `Link` 컴포넌트와 `router.push` 메서드. 각각의 특징과 사용법을 알아보겠습니다.
 
 ## 목차
+
 1. [Link 컴포넌트](#link-컴포넌트)
 2. [router.push 메서드](#routerpush-메서드)
 3. [차이점](#차이점)
@@ -480,13 +480,15 @@ Next.js에서는 페이지 간 네비게이션을 위해 주로 두 가지 방�
 `Link` 컴포넌트는 Next.js에서 제공하는 내장 컴포넌트로, 클라이언트 사이드 네비게이션을 위해 사용됩니다.
 
 ### 특징
+
 - 선언적 방식의 네비게이션
 - 자동 프리페칭 (prefetching)
 - 접근성 (a11y) 지원
 
 ### 사용법
+
 ```jsx
-import Link from 'next/link'
+import Link from "next/link";
 
 function NavMenu() {
   return (
@@ -494,7 +496,7 @@ function NavMenu() {
       <Link href="/">Home</Link>
       <Link href="/about">About</Link>
     </nav>
-  )
+  );
 }
 ```
 
@@ -503,38 +505,43 @@ function NavMenu() {
 `router.push`는 `useRouter` 훅을 통해 제공되는 프로그래매틱 네비게이션 메서드입니다.
 
 ### 특징
+
 - 명령적 방식의 네비게이션
 - 동적인 URL 생성에 유용
 - 조건부 네비게이션에 적합
 
 ### 사용법
+
 ```jsx
-import { useRouter } from 'next/router'
+import { useRouter } from "next/router";
 
 function LoginButton() {
-  const router = useRouter()
+  const router = useRouter();
 
   const handleLogin = async (user) => {
     // 로그인 로직
-    await loginUser(user)
-    router.push('/dashboard')
-  }
+    await loginUser(user);
+    router.push("/dashboard");
+  };
 
-  return <button onClick={handleLogin}>Login</button>
+  return <button onClick={handleLogin}>Login</button>;
 }
 ```
 
 ## 차이점
 
-1. **사용 방식**: 
+1. **사용 방식**:
+
    - `Link`는 선언적 (JSX 내에서 사용)
    - `router.push`는 명령적 (JavaScript 함수 내에서 사용)
 
 2. **프리페칭**:
+
    - `Link`는 자동으로 링크된 페이지를 프리페치
    - `router.push`는 수동으로 프리페치 설정 필요
 
 3. **SEO 및 접근성**:
+
    - `Link`는 일반 `<a>` 태그로 렌더링되어 SEO 및 접근성에 유리
    - `router.push`는 프로그래매틱하게 동작하여 SEO에 직접적인 영향 없음
 
@@ -545,6 +552,7 @@ function LoginButton() {
 ## 언제 무엇을 사용해야 할까?
 
 - **`Link` 사용**:
+
   - 정적인 네비게이션 링크 (메뉴, 네비게이션 바 등)
   - SEO와 접근성이 중요한 경우
   - 사용자가 클릭할 수 있는 모든 일반적인 링크
@@ -557,4 +565,74 @@ function LoginButton() {
 
 두 방법 모두 Next.js의 클라이언트 사이드 라우팅을 활용하므로, 전체 페이지 리로드 없이 빠른 네비게이션을 제공합니다. 상황에 따라 적절한 방법을 선택하여 사용하면 됩니다.
 
+## 7. 로컬 이미지 최적화
 
+Next.js의 Image 컴포넌트는 로컬에 저장된 이미지도 효과적으로 최적화할 수 있습니다. 이는 웹 성능 향상에 큰 도움이 됩니다.
+
+### 특징
+
+- 자동 이미지 크기 최적화
+- 레이지 로딩
+- 블러 플레이스홀더 지원
+- WebP와 같은 현대적 포맷으로 자동 변환
+
+### 사용법
+
+1. 먼저 이미지 파일을 프로젝트 디렉토리 내에 위치시킵니다. (예: `public/images/profile.jpg`)
+
+2. 컴포넌트에서 이미지를 import하고 Image 컴포넌트를 사용합니다:
+
+```jsx
+import Image from "next/image";
+import profilePic from "../../public/images/profile.jpg";
+
+function Profile() {
+  return (
+    <Image
+      src={profilePic}
+      alt="프로필 사진"
+      // width와 height는 원본 이미지의 크기와 일치해야 합니다
+      width={500}
+      height={500}
+      placeholder="blur"
+    />
+  );
+}
+```
+
+### 주의사항
+
+- `src`에 import한 이미지 객체를 직접 전달합니다.
+- `width`와 `height`는 원본 이미지의 크기와 일치해야 합니다. 이는 레이아웃 시프트를 방지하기 위함입니다.
+- `placeholder="blur"`를 사용하면 이미지 로딩 중 자동으로 블러 효과가 적용됩니다.
+
+### 장점
+
+1. **성능 최적화**: Next.js가 빌드 시점에 이미지를 최적화하여 더 작은 파일 크기로 제공합니다.
+2. **레이아웃 안정성**: 정확한 크기 지정으로 Cumulative Layout Shift(CLS)를 방지합니다.
+3. **유연한 반응형 디자인**: `layout` prop을 통해 다양한 화면 크기에 대응할 수 있습니다.
+
+### 예시: 반응형 이미지
+
+```jsx
+import Image from "next/image";
+import profilePic from "../../public/images/profile.jpg";
+
+function ResponsiveProfile() {
+  return (
+    <div style={{ width: "100%", height: "300px", position: "relative" }}>
+      <Image
+        src={profilePic}
+        alt="프로필 사진"
+        layout="fill"
+        objectFit="cover"
+        quality={100}
+      />
+    </div>
+  );
+}
+```
+
+이 예시에서는 `layout="fill"`을 사용하여 이미지를 컨테이너에 맞추고, `objectFit="cover"`로 이미지 비율을 유지하면서 컨테이너를 채웁니다.
+
+로컬 이미지 최적화를 통해 웹사이트의 로딩 속도를 개선하고 사용자 경험을 향상시킬 수 있습니다. Next.js의 Image 컴포넌트는 이러한 최적화를 쉽게 구현할 수 있게 해줍니다.
