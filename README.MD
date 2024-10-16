@@ -2,8 +2,41 @@
 
 # 202030418 손민욱
 
-시작 :
-npm run dev
+Next.js 프로젝트 생성
+npx create-next-app@latest --experimental-app
+
+
+`
+# npx create-next-app <app-name>
+
+이 명령어는 가장 기본적인 Next.js 앱을 생성합니다.
+
+<app-name> 부분에 여러분이 원하는 앱 이름을 넣으세요.
+기본 설정으로 프로젝트를 생성합니다.
+패키지 관리자는 기본적으로 yarn을 사용합니다.
+
+
+# npx create-next-app <app-name> --use-npm
+
+이 명령어는 기본 Next.js 앱을 생성하지만, 패키지 관리자로 npm을 사용합니다.
+
+<app-name> 부분에 여러분이 원하는 앱 이름을 넣으세요.
+--use-npm 옵션은 yarn 대신 npm을 사용하도록 지정합니다.
+npm을 선호하거나 yarn이 설치되어 있지 않은 경우 유용합니다.
+
+
+# npx create-next-app <app-name> --example with-docker
+
+이 명령어는 Docker 설정이 포함된 Next.js 앱을 생성합니다.
+
+<app-name> 부분에 여러분이 원하는 앱 이름을 넣으세요.
+--example with-docker 옵션은 Docker 관련 설정 파일이 포함된 템플릿을 사용합니다.
+이 옵션은 앱을 Docker 컨테이너에서 실행하려는 경우 유용합니다.
+Dockerfile과 docker-compose.yml 파일이 프로젝트에 포함됩니다.
+
+각 명령어는 Next.js 앱을 생성하지만, 약간 다른 설정과 도구를 사용합니다. 첫 번째는 가장 기본적인 설정, 두 번째는 npm을 사용하는 설정, 세 번째는 Docker를 사용할 준비가 된 설정을 제공합니다. 프로젝트의 요구사항에 따라 적절한 명령어를 선택하면 됩니다.`
+
+### 시작: npm run dev
 
 ## 서버사이드 렌더링 (SSR)
 
