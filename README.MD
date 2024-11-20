@@ -5,8 +5,8 @@
 Next.js 프로젝트 생성
 npx create-next-app@latest --experimental-app
 
-
 `
+
 # npx create-next-app <app-name>
 
 이 명령어는 가장 기본적인 Next.js 앱을 생성합니다.
@@ -15,7 +15,6 @@ npx create-next-app@latest --experimental-app
 기본 설정으로 프로젝트를 생성합니다.
 패키지 관리자는 기본적으로 yarn을 사용합니다.
 
-
 # npx create-next-app <app-name> --use-npm
 
 이 명령어는 기본 Next.js 앱을 생성하지만, 패키지 관리자로 npm을 사용합니다.
@@ -23,7 +22,6 @@ npx create-next-app@latest --experimental-app
 <app-name> 부분에 여러분이 원하는 앱 이름을 넣으세요.
 --use-npm 옵션은 yarn 대신 npm을 사용하도록 지정합니다.
 npm을 선호하거나 yarn이 설치되어 있지 않은 경우 유용합니다.
-
 
 # npx create-next-app <app-name> --example with-docker
 
@@ -669,3 +667,16 @@ function ResponsiveProfile() {
 이 예시에서는 `layout="fill"`을 사용하여 이미지를 컨테이너에 맞추고, `objectFit="cover"`로 이미지 비율을 유지하면서 컨테이너를 채웁니다.
 
 로컬 이미지 최적화를 통해 웹사이트의 로딩 속도를 개선하고 사용자 경험을 향상시킬 수 있습니다. Next.js의 Image 컴포넌트는 이러한 최적화를 쉽게 구현할 수 있게 해줍니다.
+
+Static Resource
+
+rest api
+
+- 기본 설계 규칙
+
+json Server
+
+-json-server src/data.json --port 3001 
+
+
+axios
