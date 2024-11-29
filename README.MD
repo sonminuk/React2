@@ -680,3 +680,735 @@ json Server
 
 
 axios
+
+# Next.js 개발 노트
+
+## 목차
+
+### 3. 메타데이터와 페이지 커스터마이징
+
+#### 3.3 메타데이터
+- Next.js에서 메타데이터는 `Metadata` 타입을 사용하여 정의할 수 있습니다.
+- 웹사이트의 기본 타이틀, 설명, 오픈 그래프, 트위터 카드 등을 설정할 수 있습니다.
+- 동적으로 메타데이터를 생성하거나 페이지별로 다른 메타데이터를 적용할 수 있습니다.
+
+#### 3.4 페이지 커스터마이징
+
+##### app.js 페이지
+- 전역 레이아웃, 스타일, 상태 관리 등을 설정할 수 있는 페이지입니다.
+- 모든 페이지에 공통으로 적용되는 컴포넌트나 로직을 정의할 수 있습니다.
+- `AppProps`를 통해 페이지 컴포넌트와 페이지 props에 접근할 수 있습니다.
+
+##### document.js 페이지
+- HTML 문서의 기본 구조를 커스터마이징할 수 있는 페이지입니다.
+- 언어 설정, 폰트 preconnect, 문자셋 등을 설정할 수 있습니다.
+- `<Head>`, `<Main>`, `<NextScript>` 컴포넌트를 사용하여 문서 구조를 제어합니다.
+
+### 4. 코드 구성과 데이터 불러오기
+
+#### 4.1 디렉터리 구조 구성
+효율적인 프로젝트 구조는 코드의 가독성과 유지보수성을 높입니다:
+- `components/`: 재사용 가능한 UI 컴포넌트
+  - `common/`: 버튼, 레이아웃 등 공통 컴포넌트
+  - `feature/`: 특정 기능에 특화된 컴포넌트
+- `utils/`: 유틸리티 함수 (포맷터, 밸리데이터 등)
+- `public/`: 정적 자원 (이미지, 아이콘)
+- `styles/`: 글로벌 스타일, 테마
+- `lib/`: API 호출, 데이터베이스 연결 등의 로직
+
+#### 4.2 데이터 불러오기
+
+##### 서버 사이드 데이터 페칭
+- Next.js는 서버 컴포넌트에서 직접 비동기 데이터 페칭을 지원합니다.
+- `async/await` 문법을 사용하여 데이터를 쉽게 불러올 수 있습니다.
+- 데이터 캐싱 옵션을 통해 성능을 최적화할 수 있습니다.
+
+##### REST API 사용
+- 서버 사이드: `fetch()` 함수를 사용하여 데이터를 불러옵니다.
+- 캐싱 전략 선택 가능 (`no-store`, `force-cache`)
+- 클라이언트 사이드: `useState`, `useEffect`를 활용하여 데이터를 동적으로 불러옵니다.
+
+##### GraphQL API 사용
+- `graphql-request` 라이브러리를 사용하여 GraphQL 쿼리 실행
+- 타입 안전성과 간결한 쿼리 작성 가능
+- 서버 또는 클라이언트 사이드에서 모두 사용 가능
+
+## 추가 팁
+- 성능 최적화를 위해 적절한 데이터 페칭 전략을 선택하세요.
+- 컴포넌트와 유틸리티를 모듈화하여 재사용성을 높이세요.
+- 메타데이터를 통해 SEO와 소셜 미디어 최적화를 고려하세요.
+
+## 학습 리소스
+- [Next.js 공식 문서](https://nextjs.org/docs)
+- [MDN Web Docs](https://developer.mozilla.org)
+- [React 공식 문서](https://reactjs.org)
+
+
+# 5. 지역 및 전역 상태 관리
+
+## 5.1 지역 상태 관리
+
+### React Hooks를 활용한 지역 상태 관리
+```typescript
+'use client'
+import { useState, useReducer } from 'react'
+
+// useState 사용 예시
+export function SimpleCounter() {
+  const [count, setCount] = useState(0)
+
+  return (
+    <div>
+      <p>Count: {count}</p>
+      <button onClick={() => setCount(count + 1)}>증가</button>
+      <button onClick={() => setCount(count - 1)}>감소</button>
+    </div>
+  )
+}
+
+// useReducer 사용 예시
+interface State {
+  count: number
+  error: string | null
+}
+
+type Action = 
+  | { type: 'increment' }
+  | { type: 'decrement' }
+  | { type: 'error', payload: string }
+
+function reducer(state: State, action: Action): State {
+  switch (action.type) {
+    case 'increment':
+      return { ...state, count: state.count + 1 }
+    case 'decrement':
+      return { ...state, count: state.count - 1 }
+    case 'error':
+      return { ...state, error: action.payload }
+    default:
+      return state
+  }
+}
+
+export function AdvancedCounter() {
+  const [state, dispatch] = useReducer(reducer, { 
+    count: 0, 
+    error: null 
+  })
+
+  return (
+    <div>
+      <p>Count: {state.count}</p>
+      <button onClick={() => dispatch({ type: 'increment' })}>증가</button>
+      <button onClick={() => dispatch({ type: 'decrement' })}>감소</button>
+      {state.error && <p>Error: {state.error}</p>}
+    </div>
+  )
+}
+```
+
+## 5.2 전역 상태 관리
+
+### Context API를 활용한 전역 상태 관리
+```typescript
+'use client'
+import React, { createContext, useContext, useState, ReactNode } from 'react'
+
+// 전역 상태 타입 정의
+interface ThemeContextType {
+  isDarkMode: boolean
+  toggleTheme: () => void
+}
+
+// Context 생성
+const ThemeContext = createContext<ThemeContextType | undefined>(undefined)
+
+// Provider 컴포넌트
+export function ThemeProvider({ children }: { children: ReactNode }) {
+  const [isDarkMode, setIsDarkMode] = useState(false)
+
+  const toggleTheme = () => {
+    setIsDarkMode(prevMode => !prevMode)
+  }
+
+  return (
+    <ThemeContext.Provider value={{ isDarkMode, toggleTheme }}>
+      <div className={isDarkMode ? 'dark-theme' : 'light-theme'}>
+        {children}
+      </div>
+    </ThemeContext.Provider>
+  )
+}
+
+// 커스텀 훅을 통한 Context 사용
+export function useTheme() {
+  const context = useContext(ThemeContext)
+  if (context === undefined) {
+    throw new Error('useTheme은 ThemeProvider 내부에서 사용해야 합니다.')
+  }
+  return context
+}
+
+// 컴포넌트에서 사용 예시
+export function ThemeToggleButton() {
+  const { isDarkMode, toggleTheme } = useTheme()
+
+  return (
+    <button onClick={toggleTheme}>
+      {isDarkMode ? '라이트 모드로 전환' : '다크 모드로 전환'}
+    </button>
+  )
+}
+
+// 앱 루트에서 Provider 사용
+export function RootLayout() {
+  return (
+    <ThemeProvider>
+      {/* 다른 컴포넌트들 */}
+      <ThemeToggleButton />
+    </ThemeProvider>
+  )
+}
+```
+
+### 복잡한 전역 상태 관리 예시
+```typescript
+'use client'
+import React, { createContext, useContext, useReducer, ReactNode } from 'react'
+
+// 사용자 상태 인터페이스
+interface User {
+  id: number
+  name: string
+  email: string
+}
+
+// 전역 상태 인터페이스
+interface AuthState {
+  user: User | null
+  isAuthenticated: boolean
+  loading: boolean
+  error: string | null
+}
+
+// 액션 타입 정의
+type AuthAction = 
+  | { type: 'LOGIN_SUCCESS'; payload: User }
+  | { type: 'LOGIN_FAILURE'; payload: string }
+  | { type: 'LOGOUT' }
+  | { type: 'SET_LOADING' }
+
+// 리듀서 함수
+function authReducer(state: AuthState, action: AuthAction): AuthState {
+  switch (action.type) {
+    case 'LOGIN_SUCCESS':
+      return {
+        ...state,
+        user: action.payload,
+        isAuthenticated: true,
+        loading: false,
+        error: null
+      }
+    case 'LOGIN_FAILURE':
+      return {
+        ...state,
+        user: null,
+        isAuthenticated: false,
+        loading: false,
+        error: action.payload
+      }
+    case 'LOGOUT':
+      return {
+        ...state,
+        user: null,
+        isAuthenticated: false,
+        loading: false,
+        error: null
+      }
+    case 'SET_LOADING':
+      return {
+        ...state,
+        loading: true
+      }
+    default:
+      return state
+  }
+}
+
+// Context 생성
+const AuthContext = createContext<{
+  state: AuthState;
+  dispatch: React.Dispatch<AuthAction>;
+} | undefined>(undefined)
+
+// Provider 컴포넌트
+export function AuthProvider({ children }: { children: ReactNode }) {
+  const [state, dispatch] = useReducer(authReducer, {
+    user: null,
+    isAuthenticated: false,
+    loading: false,
+    error: null
+  })
+
+  return (
+    <AuthContext.Provider value={{ state, dispatch }}>
+      {children}
+    </AuthContext.Provider>
+  )
+}
+
+// 커스텀 훅
+export function useAuth() {
+  const context = useContext(AuthContext)
+  if (context === undefined) {
+    throw new Error('useAuth는 AuthProvider 내부에서 사용해야 합니다.')
+  }
+  return context
+}
+
+// 로그인 함수 예시
+export async function login(email: string, password: string) {
+  const { dispatch } = useAuth()
+  
+  dispatch({ type: 'SET_LOADING' })
+  
+  try {
+    // 실제 로그인 로직 구현
+    const user = await authenticateUser(email, password)
+    dispatch({ type: 'LOGIN_SUCCESS', payload: user })
+  } catch (error) {
+    dispatch({ 
+      type: 'LOGIN_FAILURE', 
+      payload: error instanceof Error ? error.message : '로그인 실패' 
+    })
+  }
+}
+```
+
+## 상태 관리 전략 비교
+
+### 지역 상태 관리
+- `useState`: 간단한 상태 관리에 적합
+- `useReducer`: 복잡한 상태 로직에 유용
+
+### 전역 상태 관리
+- Context API: 간단한 전역 상태 공유에 적합
+- 복잡한 상태 관리는 Redux, Zustand 등의 라이브러리 고려
+
+## 주의사항
+- 과도한 전역 상태는 성능 저하 가능
+- 컴포넌트 간 데이터 흐름을 명확히 설계
+- 상태 관리 로직은 최대한 간결하고 예측 가능하게 유지
+
+# Redux 상태 관리 in Next.js
+
+## 설치 및 기본 설정
+```bash
+npm install @reduxjs/toolkit react-redux
+npm install -D @types/react-redux
+```
+
+## Redux Toolkit 구조
+
+### 1. Store 설정
+```typescript
+// lib/store.ts
+import { configureStore } from '@reduxjs/toolkit'
+import counterReducer from './counterSlice'
+import userReducer from './userSlice'
+
+export const store = configureStore({
+  reducer: {
+    counter: counterReducer,
+    user: userReducer
+  }
+})
+
+// RootState와 Dispatch 타입 정의
+export type RootState = ReturnType<typeof store.getState>
+export type AppDispatch = typeof store.dispatch
+```
+
+### 2. Slice 생성
+```typescript
+// lib/counterSlice.ts
+import { createSlice, PayloadAction } from '@reduxjs/toolkit'
+
+interface CounterState {
+  value: number
+}
+
+const initialState: CounterState = {
+  value: 0
+}
+
+export const counterSlice = createSlice({
+  name: 'counter',
+  initialState,
+  reducers: {
+    increment: (state) => {
+      state.value += 1
+    },
+    decrement: (state) => {
+      state.value -= 1
+    },
+    incrementByAmount: (state, action: PayloadAction<number>) => {
+      state.value += action.payload
+    }
+  }
+})
+
+export const { increment, decrement, incrementByAmount } = counterSlice.actions
+export default counterSlice.reducer
+```
+
+### 3. 비동기 액션 생성 (Thunk)
+```typescript
+// lib/userSlice.ts
+import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
+import axios from 'axios'
+
+interface User {
+  id: number
+  name: string
+  email: string
+}
+
+interface UserState {
+  users: User[]
+  status: 'idle' | 'loading' | 'succeeded' | 'failed'
+  error: string | null
+}
+
+const initialState: UserState = {
+  users: [],
+  status: 'idle',
+  error: null
+}
+
+// 비동기 액션 생성
+export const fetchUsers = createAsyncThunk(
+  'users/fetchUsers',
+  async () => {
+    const response = await axios.get('https://jsonplaceholder.typicode.com/users')
+    return response.data
+  }
+)
+
+export const userSlice = createSlice({
+  name: 'users',
+  initialState,
+  reducers: {},
+  extraReducers: (builder) => {
+    builder
+      .addCase(fetchUsers.pending, (state) => {
+        state.status = 'loading'
+      })
+      .addCase(fetchUsers.fulfilled, (state, action) => {
+        state.status = 'succeeded'
+        state.users = action.payload
+      })
+      .addCase(fetchUsers.rejected, (state, action) => {
+        state.status = 'failed'
+        state.error = action.error.message || null
+      })
+  }
+})
+
+export default userSlice.reducer
+```
+
+### 4. Redux Provider 설정
+```typescript
+// pages/_app.tsx
+'use client'
+import { Provider } from 'react-redux'
+import { store } from '../lib/store'
+
+function MyApp({ Component, pageProps }) {
+  return (
+    <Provider store={store}>
+      <Component {...pageProps} />
+    </Provider>
+  )
+}
+
+export default MyApp
+```
+
+### 5. 컴포넌트에서 사용
+```typescript
+// components/Counter.tsx
+'use client'
+import { useSelector, useDispatch } from 'react-redux'
+import { RootState, AppDispatch } from '../lib/store'
+import { 
+  increment, 
+  decrement, 
+  incrementByAmount 
+} from '../lib/counterSlice'
+
+export function Counter() {
+  // 상태 선택
+  const count = useSelector((state: RootState) => state.counter.value)
+  
+  // 디스패치 훅
+  const dispatch = useDispatch<AppDispatch>()
+
+  return (
+    <div>
+      <div>
+        <button onClick={() => dispatch(decrement())}>
+          -
+        </button>
+        <span>{count}</span>
+        <button onClick={() => dispatch(increment())}>
+          +
+        </button>
+      </div>
+      <button onClick={() => dispatch(incrementByAmount(5))}>
+        Add 5
+      </button>
+    </div>
+  )
+}
+```
+
+### 6. 선택자 최적화
+```typescript
+// lib/hooks.ts
+import { TypedUseSelectorHook, useSelector, useDispatch } from 'react-redux'
+import { RootState, AppDispatch } from './store'
+
+// 타입이 지정된 훅 생성
+export const useAppSelector: TypedUseSelectorHook<RootState> = useSelector
+export const useAppDispatch = () => useDispatch<AppDispatch>()
+```
+
+## Redux 개발 도구
+```bash
+npm install redux-devtools-extension
+```
+
+## 주요 Redux 패턴
+1. **Slice**: 리듀서와 액션을 한 곳에서 관리
+2. **Thunk**: 비동기 로직 처리
+3. **Selector**: 상태 선택 최적화
+4. **Immutable Update**: 불변성 유지
+
+## 성능 최적화 팁
+- `useSelector`의 최소 상태 선택
+- 메모이제이션 활용 (`createSelector`)
+- 불필요한 리렌더링 방지
+
+## 주의사항
+- 클라이언트 컴포넌트에서만 Redux 사용
+- 서버 컴포넌트와 상태 동기화 주의
+- 과도한 전역 상태 사용 자제
+
+# Next.js 프로젝트 GitHub 배포 가이드
+
+## 1. GitHub 저장소 준비
+
+### 1.1 GitHub 저장소 생성
+```bash
+# 프로젝트 디렉터리로 이동
+cd your-nextjs-project
+
+# Git 초기화
+git init
+
+# .gitignore 파일 생성
+touch .gitignore
+```
+
+### 1.2 .gitignore 설정
+```gitignore
+# 의존성 폴더
+/node_modules
+
+# 빌드 출력
+/.next/
+/out/
+/build
+
+# 환경 변수
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# 로그
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# IDE 설정
+.idea/
+.vscode/
+*.swp
+.DS_Store
+```
+
+## 2. GitHub 배포 방법
+
+### 2.1 GitHub Actions를 이용한 자동 배포 (Vercel)
+```yaml
+# .github/workflows/deploy.yml
+name: Deploy to Vercel
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+      
+      - name: Install Dependencies
+        run: npm ci
+      
+      - name: Build Project
+        run: npm run build
+      
+      - name: Deploy to Vercel
+        uses: amondnet/vercel-action@v20
+        with:
+          vercel-token: ${{ secrets.VERCEL_TOKEN }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
+          vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
+```
+
+### 2.2 GitHub Pages 배포
+```yaml
+# .github/workflows/github-pages.yml
+name: GitHub Pages Deployment
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+      
+      - name: Install Dependencies
+        run: npm ci
+      
+      - name: Build Project
+        run: npm run build
+      
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./out
+```
+
+## 3. 배포 스크립트 설정
+
+### package.json 설정
+```json
+{
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "export": "next build && next export",
+    "deploy": "next build && next export && touch out/.nojekyll"
+  }
+}
+```
+
+## 4. 환경 변수 관리
+
+### 4.1 로컬 환경 변수
+```bash
+# .env.local
+NEXT_PUBLIC_API_URL=https://api.example.com
+DATABASE_SECRET=your_secret_key
+```
+
+### 4.2 GitHub Secrets 설정
+1. GitHub 저장소 설정 → Secrets and variables
+2. Actions secrets 섹션에서 환경 변수 추가
+   - `VERCEL_TOKEN`
+   - `VERCEL_ORG_ID`
+   - `VERCEL_PROJECT_ID`
+
+## 5. 배포 최적화 팁
+
+### 5.1 정적 내보내기 설정
+```javascript
+// next.config.js
+/** @type {import('next').NextConfig} */
+const nextConfig = {
+  output: 'export',
+  
+  // 정적 내보내기를 위한 설정
+  trailingSlash: true,
+  
+  // 동적 경로 설정
+  exportPathMap: async function () {
+    return {
+      '/': { page: '/' },
+      '/about': { page: '/about' }
+    }
+  }
+}
+
+module.exports = nextConfig
+```
+
+## 6. 배포 문제 해결
+
+### 일반적인 배포 문제
+1. 경로 문제: 정적 자산 경로 확인
+2. 환경 변수 누락
+3. 빌드 스크립트 오류
+4. 의존성 충돌
+
+### 디버깅 팁
+- GitHub Actions 로그 확인
+- Vercel 또는 GitHub Pages 배포 로그 점검
+- 로컬 빌드와 배포 빌드 비교
+
+## 7. 주의사항
+- 민감한 정보는 절대 공개 저장소에 업로드 금지
+- GitHub Secrets 활용
+- 환경별 설정 분리
+
+## 참고 자료
+- [Next.js 공식 배포 문서](https://nextjs.org/docs/deployment)
+- [GitHub Actions 문서](https://docs.github.com/en/actions)
+- [Vercel 배포 가이드](https://vercel.com/docs/frameworks/nextjs)
+```
+
+이 문서는 Next.js 프로젝트를 GitHub에 배포하는 포괄적인 가이드입니다. GitHub Actions를 활용한 Vercel 및 GitHub Pages 배포 방법, 환경 변수 관리, 배포 최적화 팁 등을 포함하고 있습니다.
+
+주요 내용:
+1. GitHub 저장소 준비
+2. 배포 워크플로우 설정
+3. 환경 변수 및 시크릿 관리
+4. 정적 내보내기 설정
+5. 배포 문제 해결 방법
+
+필요하시다면 언제든 수정하거나 추가 설명을 요청해주세요.
